@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const mongoose = require("mongoose");
 
 const postSchema = new Schema(
   {
@@ -24,6 +24,6 @@ const postSchema = new Schema(
   }
 );
 
-const Post = model("Post", postSchema);
+const Post = new mongoose.model("Post", postSchema);
 
 module.exports = Post;

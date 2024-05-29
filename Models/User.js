@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const mongoose = require("mongoose");
 
 const userSchema = new Schema({
   username: {
@@ -21,6 +21,6 @@ const userSchema = new Schema({
   favThemes: [{ type: Number, ref: "Theme" }],
 });
 
-const User = model("User", userSchema);
+const User = new mongoose.model("User", userSchema);
 
 module.exports = User;
