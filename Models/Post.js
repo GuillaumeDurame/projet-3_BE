@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const postSchema = new Schema(
+const postSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -14,7 +14,7 @@ const postSchema = new Schema(
       maxLength: [300, "content must not exceed 300 characters"],
     },
     author: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: [true, "author is required"],
     },
@@ -24,6 +24,6 @@ const postSchema = new Schema(
   }
 );
 
-const Post = new mongoose.model("Post", postSchema);
+const Post = mongoose.model("Post", postSchema);
 
 module.exports = Post;
