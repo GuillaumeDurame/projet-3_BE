@@ -9,9 +9,24 @@ const WishListSchema = new mongoose.Schema({
     type: String,
     maxLength: 300,
   },
-  Wish: {
-    type: [String],
-  },
+  invParts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "InventoryPart",
+    },
+  ],
+  minifigs: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Minifig",
+    },
+  ],
+  sets: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Set",
+    },
+  ],
 });
 
 const Wishlist = new mongoose.model("Wishlist", WishListSchema);
