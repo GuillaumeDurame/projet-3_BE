@@ -2,7 +2,10 @@ const mongoose = require("mongoose");
 const { Router } = require("express");
 const router = Router();
 
+const protectionMiddleware = require("../middlewares/protection.middleware");
 const Wishlist = require("../Models/Wishlist");
+
+router.use(protectionMiddleware);
 
 router.post("/", async (req, res) => {
   try {

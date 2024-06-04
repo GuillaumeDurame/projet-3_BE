@@ -5,6 +5,8 @@ const PORT = 5000;
 const userRouter = require("./Routes/User.route");
 const postRouter = require("./Routes/Post.route");
 const wishlistRouter = require("./Routes/Wishlist.route");
+const cors = require("cors");
+const { CORS_ORIGIN } = require("./const");
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/projet-3")
