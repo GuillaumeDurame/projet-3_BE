@@ -5,6 +5,7 @@ const PORT = 5000;
 const userRouter = require("./Routes/User.route");
 const postRouter = require("./Routes/Post.route");
 const wishlistRouter = require("./Routes/Wishlist.route");
+const setsRouter = require("./Routes/Sets.route");
 const cors = require("cors");
 const { CORS_ORIGIN } = require("./const");
 
@@ -17,13 +18,14 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: CORS_ORIGIN
+    origin: CORS_ORIGIN,
   })
 );
 
 app.use("/users", userRouter);
 app.use("/posts", postRouter);
 app.use("/wishlists", wishlistRouter);
+app.use("/sets", setsRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
