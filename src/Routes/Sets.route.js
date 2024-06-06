@@ -4,8 +4,15 @@ const router = express.Router();
 // Importation du modèle Set
 const Set = require("../Models/Set");
 
+// Middleware pour la gestion des erreurs
+const errorHandler = (err, req, res, next) => {
+  res.status(err.status || 500).json({
+    message: err.message || "Internal Server Error",
+  });
+};
+
 // Route GET pour récupérer les sets avec une pagination
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   // Récupération des params de pagination de la requête, avec des valeurs par défaut
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 100;
@@ -22,7 +29,7 @@ router.get("/", async (req, res) => {
     res.json({ sets, totalSets });
   } catch (err) {
     // En cas d'erreur, envoi de l'erreur
-    res.send(err);
+    next(err);
   }
 });
 

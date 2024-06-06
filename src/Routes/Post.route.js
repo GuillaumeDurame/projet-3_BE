@@ -4,7 +4,7 @@ const router = Router();
 
 const Post = require("../Models/Post");
 
-router.post("/", async (req, res) => {
+router.post("/", async (req, res,) => {
   try {
     const newPost = await Post.create({
       title: req.body.title,
