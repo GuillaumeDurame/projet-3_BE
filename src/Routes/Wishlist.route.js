@@ -2,65 +2,94 @@ const express = require("express");
 const router = express.Router();
 const Wishlist = require("../models/Wishlist");
 const protectionMiddleware = require("../middlewares/protection.middleware");
+const MiniFig = require("../Models/Minifig");
+const Set = require("../Models/Set");
+const InventoryPart = require("../Models/InventoryPart");
 
 router.use(protectionMiddleware);
 
-router.get("/wishlist", (req, res) => {
-  const { userId } = req.query;
-
-  Wishlist.find({ userId })
-    .then((wishlist) => res.json(wishlist))
-    .catch((err) => res.status(500).json({ error: err.message }));
-});
-
-router.post("/wishlist", (req, res) => {
-  const { userId, set } = req.body;
-
-  Wishlist.create({ userId, set })
-    .then(() => res.json({ message: "added" }))
-    .catch((err) => res.status(500).json({ error: err.message }));
-});
-
-router.put("/wishlist", async (req, res) => {
-  const { elementCollection, elementId } = req.body;
+router.get("/", async (req, res) => {
   try {
-    const updatedWishlist = await Wishlist.findOneAndUpdate(
-      { owner: req.user.id },
-      { $push: { [elementCollection]: elementId } },
-      { new: true }
-    );
-    res.json(updatedWishlist);
-  } catch (error) {}
-});
-
-router.put("/wishlist", async (req, res) => {
-  const { elementCollection, elementId } = req.body;
-  try {
-    const updatedWishlist = await Wishlist.findOneAndUpdate(
-      { owner: req.user.id },
-      { $pull: { [elementCollection]: elementId } },
-      { new: true }
-    );
-    res.json(updatedWishlist);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    const wishlist = await Wishlist.findOne({ owner: req.user.id }).populate([
+      { path: "sets", model: Set },
+      { path: "minifigs", model: MiniFig },
+      { path: "invParts", model: InventoryPart },
+    ]);
+    // .populate("minifigs")
+    // .populate("invParts");
+    res.json(wishlist);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
   }
 });
 
-router.delete("/wishlist", (req, res) => {
-  const { userId, setId } = req.body;
+router.post("/", async (req, res) => {
+  const { name, description } = req.body;
+  try {
+    const existingWishlist = await Wishlist.findOne({ owner: req.user.id });
+    if (existingWishlist) {
+      return res.status(400).json(err);
+    }
 
-  Wishlist.deleteOne({ userId, "set._id": setId })
-    .then(() => res.json({ message: "removed" }))
-    .catch((err) => res.status(500).json({ error: err.message }));
+    const newWishlist = new Wishlist({
+      owner: req.user.id,
+      name,
+      description,
+      invParts: [],
+      minifigs: [],
+      sets: [],
+    });
+
+    await newWishlist.save();
+    res.json({ message: "Wishlist created", wishlist: newWishlist });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
 });
 
-router.delete("/wishlist/all", (req, res) => {
-  const { userId } = req.body;
+router.put("/add", async (req, res) => {
+  const { elementCollection, elementId } = req.body;
+  try {
+    const wishlist = await Wishlist.findOne({ owner: req.user.id });
+    if (!wishlist) {
+      return res.status(404).json();
+    }
 
-  Wishlist.deleteMany({ userId })
-    .then(() => res.json({ message: "cleared" }))
-    .catch((err) => res.status(500).json({ error: err.message }));
+    wishlist[elementCollection].push(elementId);
+    await wishlist.save();
+    res.json(wishlist);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.put("/remove", async (req, res) => {
+  const { elementCollection, elementId } = req.body;
+  try {
+    const wishlist = await Wishlist.findOne({ owner: req.user.id });
+    if (!wishlist) {
+      return res.status(404).json();
+    }
+
+    wishlist[elementCollection] = wishlist[elementCollection].filter(
+      (id) => id.toString() !== elementId
+    );
+    await wishlist.save();
+    res.json();
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.delete("/all", async (req, res) => {
+  try {
+    await Wishlist.deleteMany({ owner: req.user.id });
+    res.json();
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 module.exports = router;

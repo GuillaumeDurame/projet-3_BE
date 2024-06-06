@@ -9,6 +9,7 @@ const wishlistRouter = require("./Routes/Wishlist.route");
 const setsRouter = require("./Routes/Sets.route");
 const cors = require("cors");
 const { CORS_ORIGIN } = require("./const");
+const InventoryPart = require("./Models/InventoryPart");
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/projet-3")
@@ -24,9 +25,15 @@ app.use(
   })
 );
 
+app.get("/", async (req, res) => {
+  const InventoryParts = await InventoryPart.find().limit(10);
+  console.log(InventoryParts);
+  res.json(InventoryParts);
+});
+
 app.use("/users", userRouter);
 app.use("/posts", postRouter);
-app.use("/wishlists", wishlistRouter);
+app.use("/wishlist", wishlistRouter);
 app.use("/sets", setsRouter);
 
 app.listen(PORT, () => {

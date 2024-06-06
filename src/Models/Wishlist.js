@@ -6,10 +6,10 @@ const WishListSchema = new mongoose.Schema({
     required : true,
     ref : "User",
   },
-  name: {
-    type: String,
-    required: [true, "name is required"],
-  },
+  // name: {
+  //   type: String,
+  //   required: [true, "name is required"],
+  // },
   description: {
     type: String,
     maxLength: 300,

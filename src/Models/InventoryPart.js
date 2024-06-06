@@ -20,6 +20,6 @@ const inventoryPartSchema = new mongoose.Schema({
   },
 });
 
-const InventoryPart = mongoose.model("InventoryPart", inventoryPartSchema);
+const InventoryPart = mongoose.model("InventoryPart", inventoryPartSchema, "inventory_parts");
 
 module.exports = InventoryPart;
