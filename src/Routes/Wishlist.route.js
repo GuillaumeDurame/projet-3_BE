@@ -1,6 +1,7 @@
+"use strict";
 const express = require("express");
 const router = express.Router();
-const Wishlist = require("../models/Wishlist");
+const Wishlist = require("../Models/Wishlist");
 const protectionMiddleware = require("../middlewares/protection.middleware");
 const MiniFig = require("../Models/Minifig");
 const Set = require("../Models/Set");
@@ -40,7 +41,7 @@ router.post("/", async (req, res) => {
       minifigs: [],
       sets: [],
     });
-//coucou
+    //coucou
     await newWishlist.save();
     res.json({ message: "Wishlist created", wishlist: newWishlist });
   } catch (err) {
