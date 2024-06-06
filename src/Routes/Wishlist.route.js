@@ -1,54 +1,66 @@
-const mongoose = require("mongoose");
-const { Router } = require("express");
-const router = Router();
-
+const express = require("express");
+const router = express.Router();
+const Wishlist = require("../models/Wishlist");
 const protectionMiddleware = require("../middlewares/protection.middleware");
-const Wishlist = require("../Models/Wishlist");
 
 router.use(protectionMiddleware);
 
-router.post("/", async (req, res) => {
+router.get("/wishlist", (req, res) => {
+  const { userId } = req.query;
+
+  Wishlist.find({ userId })
+    .then((wishlist) => res.json(wishlist))
+    .catch((err) => res.status(500).json({ error: err.message }));
+});
+
+router.post("/wishlist", (req, res) => {
+  const { userId, set } = req.body;
+
+  Wishlist.create({ userId, set })
+    .then(() => res.json({ message: "added" }))
+    .catch((err) => res.status(500).json({ error: err.message }));
+});
+
+router.put("/wishlist", async (req, res) => {
+  const { elementCollection, elementId } = req.body;
   try {
-    const newWishlist = await Wishlist.create({
-      name: req.body.name,
-      description: req.body.description,
-      invParts: req.body.invParts,
-      MiniFigs: req.body.MiniFigs,
-      sets: req.body.sets,
-    });
-    res.status(201).json(newWishlist);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+    const updatedWishlist = await Wishlist.findOneAndUpdate(
+      { owner: req.user.id },
+      { $push: { [elementCollection]: elementId } },
+      { new: true }
+    );
+    res.json(updatedWishlist);
+  } catch (error) {}
+});
+
+router.put("/wishlist", async (req, res) => {
+  const { elementCollection, elementId } = req.body;
+  try {
+    const updatedWishlist = await Wishlist.findOneAndUpdate(
+      { owner: req.user.id },
+      { $pull: { [elementCollection]: elementId } },
+      { new: true }
+    );
+    res.json(updatedWishlist);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-router.get("/", async (req, res) => {
-  try {
-    const Wishes = await Wishlist.find();
-    res.json(Wishes);
-  } catch (err) {
-    res.json({ message: err.message });
-  }
+router.delete("/wishlist", (req, res) => {
+  const { userId, setId } = req.body;
+
+  Wishlist.deleteOne({ userId, "set._id": setId })
+    .then(() => res.json({ message: "removed" }))
+    .catch((err) => res.status(500).json({ error: err.message }));
 });
 
-router.put("/:id", async (req, res) => {
-  try {
-    const _id = req.params.id;
-    const UpdateRequest = await Wishlist.findByIdAndUpdate(_id, req.body);
-    res.json(UpdateRequest);
-  } catch (err) {
-    res.status(404).json({ message: err.message });
-  }
-});
+router.delete("/wishlist/all", (req, res) => {
+  const { userId } = req.body;
 
-router.delete("/:id", async (req, res) => {
-  try {
-    console.log(req.params.id);
-    const DeleteRequest = await Wishlist.findByIdAndDelete(req.params.id);
-    res.json(DeleteRequest);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+  Wishlist.deleteMany({ userId })
+    .then(() => res.json({ message: "cleared" }))
+    .catch((err) => res.status(500).json({ error: err.message }));
 });
 
 module.exports = router;

@@ -3,15 +3,17 @@ const router = express.Router();
 
 const Set = require("../Models/Set");
 
-router.get("/", (req, res) => {
-  const page = Number(req.query.page);
-  const limit = Number(req.query.limit);
+router.get("/", async (req, res) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 100;
   const skipIndex = (page - 1) * limit;
-  Set.find()
-    .skip(skipIndex)
-    .limit(limit)
-    .then((sets) => res.json(sets))
-    .catch((err) => res.status(500).json({ error: err.message }));
+  try {
+    const sets = await Set.find().skip(skipIndex).limit(limit);
+    const totalSets = await Set.countDocuments();
+    res.json({sets,totalSets})
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;

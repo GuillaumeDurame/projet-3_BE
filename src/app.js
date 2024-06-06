@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const morgan = require("morgan");
 const PORT = 5000;
 
 const userRouter = require("./Routes/User.route");
@@ -15,6 +16,7 @@ mongoose
   .catch((err) => console.error("Error connecting to MongoDB", err));
 
 const app = express();
+app.use(morgan("dev"));
 app.use(express.json());
 app.use(
   cors({
