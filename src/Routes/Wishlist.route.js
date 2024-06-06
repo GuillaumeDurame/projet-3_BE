@@ -40,7 +40,7 @@ router.post("/", async (req, res) => {
       minifigs: [],
       sets: [],
     });
-
+//coucou
     await newWishlist.save();
     res.json({ message: "Wishlist created", wishlist: newWishlist });
   } catch (err) {
